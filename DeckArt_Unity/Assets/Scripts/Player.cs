@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
+using UnityEngine;
+using UnityEngine.XR;
 using UnityUtility.Extensions;
 
 [Serializable]
@@ -8,7 +9,7 @@ public class Player
 {
     public const int DECK_SIZE = 30;
     
-    public List<Card> cards;
+    public List<Card> deck;
     public string name;
     
     [NonSerialized] public int maxHealth, currentHealth; 
@@ -21,6 +22,10 @@ public class Player
     
     public Player()
     {
+        hand = new Hand();
+        board = new Board();
+
+
         Reset();
     }
 
@@ -34,11 +39,13 @@ public class Player
     public void PlayCards()
     {
         Card cardToPlay = hand.GetCardToPlay(currentMana);
-        while (!cardToPlay.IsUnityNull())
+        while (cardToPlay != null)
         {
             hand.RemoveCard(cardToPlay);
             board.AddCard(cardToPlay);
             currentMana -= cardToPlay.cost;
+
+            cardToPlay = hand.GetCardToPlay(currentMana);
         }
     }
 
@@ -65,25 +72,35 @@ public class Player
             hand.AddCard(Draw());
         }
     }
+
+    public static Player FromJson(string json)
+    {
+        return JsonUtility.FromJson<Player>(json);
+    }
+
+    public string ToJson()
+    {
+        return JsonUtility.ToJson(this);
+    }
     
     #region Deck
     public void CreateDeck()
     {
-        cards = new List<Card>(DECK_SIZE);
+        deck = new List<Card>(DECK_SIZE);
 
-        AssetList allCards = AssetList.CreateAllPossibleCards();
+        AssetList allCards = AssetList.GetAllPossibleCards();
 
         allCards.cards.Shuffle();
         for (int i = 0; i < DECK_SIZE; i++)
         {
-            cards.Add(allCards.cards[i]);
+            deck.Add(allCards.cards[i]);
         }
     }
 
     public Card Draw()
     {
-        Card drawnCard = cards[^1];
-        cards.RemoveAt(cards.Count - 1);
+        Card drawnCard = deck[^1];
+        deck.RemoveAt(deck.Count - 1);
         return drawnCard;
     }
     

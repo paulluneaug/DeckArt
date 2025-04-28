@@ -1,16 +1,31 @@
 using System;
 using UnityEngine;
+using UnityUtility.CustomAttributes;
 
 public class GameManager : MonoBehaviour
 {
-    public Player player, player2;
-    
+    public Player player;
+
+    [Button(nameof(LoadPlayer))]
+    [SerializeField] private string m_referencePlayerJsonPath;
+
+    [NonSerialized] private Player player2;
+
     [NonSerialized] public Player currentPlayer, otherPlayer;
 
 
     private void Awake()
     {
+
+        LoadPlayer();
         Reset();
+    }
+
+    private void LoadPlayer()
+    {
+        TextAsset json = Resources.Load<TextAsset>(m_referencePlayerJsonPath);
+        player2 = Player.FromJson(json.text);
+        player2.deck.ForEach(card => { Debug.Log(card); });
     }
 
     private void Update()
@@ -23,10 +38,10 @@ public class GameManager : MonoBehaviour
         currentPlayer.StartTurn();
         currentPlayer.PlayCards();
         otherPlayer.TakeDamage(currentPlayer.Attack());
-        
-        if(otherPlayer.currentHealth <= 0)
+
+        if (otherPlayer.currentHealth <= 0)
             Win(currentPlayer);
-        
+
         (currentPlayer, otherPlayer) = (otherPlayer, currentPlayer);
     }
 
@@ -40,7 +55,7 @@ public class GameManager : MonoBehaviour
     {
         player.Reset();
         player2.Reset();
-        
+
         currentPlayer = player;
         otherPlayer = player2;
     }

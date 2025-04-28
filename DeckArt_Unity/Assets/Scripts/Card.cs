@@ -21,6 +21,11 @@ public class Card
         cost = ComputeCardCost(atk, def);
     }
 
+    public override string ToString()
+    {
+        return name;
+    }
+
     public static int ComputeCardCost(int attack, int defense)
     {
         return (int)MathUf.Floor((attack + defense) / 2.0f);

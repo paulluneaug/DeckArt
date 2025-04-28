@@ -18,7 +18,7 @@ public class AssetList
     }
 
 
-    public static AssetList CreateAllPossibleCards()
+    public static AssetList GetAllPossibleCards()
     {
         if (instance == null)
         {
