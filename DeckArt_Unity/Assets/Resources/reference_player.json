@@ -1,0 +1,155 @@
+{
+    "deck": [
+        {
+            "name": "Card(atk=5, def=5)",
+            "attack": 5,
+            "defense": 5
+        },
+        {
+            "name": "Card(atk=2, def=2)",
+            "attack": 2,
+            "defense": 2
+        },
+        {
+            "name": "Card(atk=1, def=6)",
+            "attack": 1,
+            "defense": 6
+        },
+        {
+            "name": "Card(atk=2, def=8)",
+            "attack": 2,
+            "defense": 8
+        },
+        {
+            "name": "Card(atk=3, def=6)",
+            "attack": 3,
+            "defense": 6
+        },
+        {
+            "name": "Card(atk=1, def=3)",
+            "attack": 1,
+            "defense": 3
+        },
+        {
+            "name": "Card(atk=5, def=6)",
+            "attack": 5,
+            "defense": 6
+        },
+        {
+            "name": "Card(atk=12, def=1)",
+            "attack": 12,
+            "defense": 1
+        },
+        {
+            "name": "Card(atk=0, def=13)",
+            "attack": 0,
+            "defense": 13
+        },
+        {
+            "name": "Card(atk=3, def=4)",
+            "attack": 3,
+            "defense": 4
+        },
+        {
+            "name": "Card(atk=8, def=4)",
+            "attack": 8,
+            "defense": 4
+        },
+        {
+            "name": "Card(atk=8, def=2)",
+            "attack": 8,
+            "defense": 2
+        },
+        {
+            "name": "Card(atk=4, def=9)",
+            "attack": 4,
+            "defense": 9
+        },
+        {
+            "name": "Card(atk=6, def=1)",
+            "attack": 6,
+            "defense": 1
+        },
+        {
+            "name": "Card(atk=2, def=11)",
+            "attack": 2,
+            "defense": 11
+        },
+        {
+            "name": "Card(atk=8, def=3)",
+            "attack": 8,
+            "defense": 3
+        },
+        {
+            "name": "Card(atk=3, def=3)",
+            "attack": 3,
+            "defense": 3
+        },
+        {
+            "name": "Card(atk=10, def=2)",
+            "attack": 10,
+            "defense": 2
+        },
+        {
+            "name": "Card(atk=0, def=1)",
+            "attack": 0,
+            "defense": 1
+        },
+        {
+            "name": "Card(atk=3, def=10)",
+            "attack": 3,
+            "defense": 10
+        },
+        {
+            "name": "Card(atk=4, def=3)",
+            "attack": 4,
+            "defense": 3
+        },
+        {
+            "name": "Card(atk=9, def=3)",
+            "attack": 9,
+            "defense": 3
+        },
+        {
+            "name": "Card(atk=7, def=1)",
+            "attack": 7,
+            "defense": 1
+        },
+        {
+            "name": "Card(atk=1, def=8)",
+            "attack": 1,
+            "defense": 8
+        },
+        {
+            "name": "Card(atk=6, def=6)",
+            "attack": 6,
+            "defense": 6
+        },
+        {
+            "name": "Card(atk=7, def=4)",
+            "attack": 7,
+            "defense": 4
+        },
+        {
+            "name": "Card(atk=2, def=10)",
+            "attack": 2,
+            "defense": 10
+        },
+        {
+            "name": "Card(atk=2, def=7)",
+            "attack": 2,
+            "defense": 7
+        },
+        {
+            "name": "Card(atk=0, def=8)",
+            "attack": 0,
+            "defense": 8
+        },
+        {
+            "name": "Card(atk=3, def=1)",
+            "attack": 3,
+            "defense": 1
+        }
+    ],
+    "name": "Reference Player"
+}
