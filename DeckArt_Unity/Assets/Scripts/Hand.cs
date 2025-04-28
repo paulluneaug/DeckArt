@@ -7,42 +7,22 @@ public class Hand
 {
     public List<Card> cards = new();
 
-    private Card GetHighestCard(ref List<Card> cardsToPickFrom)
-    {
-        Card highestCard = cards[0];
-
-        foreach (Card card in cards)
-        {
-            if(card.cost > highestCard.cost)
-                highestCard = card;
-        }
-
-        cardsToPickFrom.Remove(highestCard);
-        return highestCard;
-    }
-
     public Card GetCardToPlay(int maxMana)
     {
-        List<Card> cardsCopy = new List<Card>(cards);
-        
-        Card highestCard = GetHighestCard(ref cardsCopy);
-
-        while (cardsCopy.Count > 0 || highestCard.cost > maxMana)
-        {
-            highestCard = GetHighestCard(ref cardsCopy);
-        }
-
-        if (cardsCopy.Count == 0)
-        {
-            return null;
-        }
-
-        return highestCard;
+        Card card = cards.FindLast(x => x.cost <= maxMana);
+        return card;
     }
 
     public void AddCard(Card cardToAdd)
     {
-        cards.Add(cardToAdd);
+        int manaCost = cardToAdd.cost;
+        int index = cards.FindLastIndex(x => x.cost <= manaCost);
+        if (index == -1)
+        {
+            cards.Add(cardToAdd);
+            return;
+        }
+        cards.Insert(index, cardToAdd);
     }
 
     public void RemoveCard(Card cardToRemove)
