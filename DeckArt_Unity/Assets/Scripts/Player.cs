@@ -1,19 +1,24 @@
 using System;
+using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityUtility.Extensions;
 
 [Serializable]
 public class Player
 {
+    public const int DECK_SIZE = 30;
+    
+    public List<Card> cards;
+    public string name;
+    
     [NonSerialized] public int maxHealth, currentHealth; 
     [NonSerialized] public int manaMax, currentMana;
     [NonSerialized] public int cardCountStart = 5;
     
     [NonSerialized] public Hand hand;
     [NonSerialized] public Board board;
-    [NonSerialized] public Deck deck;
-
-    public string name;
-
+    
+    
     public Player()
     {
         Reset();
@@ -23,7 +28,7 @@ public class Player
     {
         manaMax++;
         currentMana = manaMax;
-        hand.AddCard(deck.Draw());
+        hand.AddCard(Draw());
     }
 
     public void PlayCards()
@@ -52,10 +57,36 @@ public class Player
         currentHealth = maxHealth;
         hand.Reset();
         board.Reset();
+        
+        CreateDeck();
 
         for (int loop = 0; loop < cardCountStart; loop++)
         {
-            hand.AddCard(deck.Draw());
+            hand.AddCard(Draw());
         }
     }
+    
+    #region Deck
+    public void CreateDeck()
+    {
+        cards = new List<Card>(DECK_SIZE);
+
+        AssetList allCards = AssetList.CreateAllPossibleCards();
+
+        allCards.cards.Shuffle();
+        for (int i = 0; i < DECK_SIZE; i++)
+        {
+            cards.Add(allCards.cards[i]);
+        }
+    }
+
+    public Card Draw()
+    {
+        Card drawnCard = cards[^1];
+        cards.RemoveAt(cards.Count - 1);
+        return drawnCard;
+    }
+    
+
+    #endregion
 }
