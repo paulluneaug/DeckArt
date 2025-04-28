@@ -1,32 +1,31 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.XR;
 using UnityUtility.Extensions;
 
 [Serializable]
 public class Player
 {
     public const int DECK_SIZE = 30;
-    
+
     public List<Card> deck;
     public string name;
-    
-    [NonSerialized] public int maxHealth, currentHealth; 
+
+    [NonSerialized] public int maxHealth, currentHealth;
     [NonSerialized] public int manaMax, currentMana;
     [NonSerialized] public int cardCountStart = 5;
-    
+
     [NonSerialized] public Hand hand;
     [NonSerialized] public Board board;
-    
-    
+
+    [NonSerialized] public List<Card> storedDeck;
+
     public Player()
     {
         hand = new Hand();
         board = new Board();
 
 
-        Reset();
     }
 
     public void StartTurn()
@@ -59,13 +58,20 @@ public class Player
         currentHealth -= damage;
     }
 
-    public void Reset()
+    public void Reset(bool recreateDeck)
     {
         currentHealth = maxHealth;
         hand.Reset();
         board.Reset();
-        
-        CreateDeck();
+
+        if (recreateDeck)
+        {
+            CreateDeck();
+        }
+        else
+        {
+            deck = new List<Card>(storedDeck);
+        }
 
         for (int loop = 0; loop < cardCountStart; loop++)
         {
@@ -75,14 +81,16 @@ public class Player
 
     public static Player FromJson(string json)
     {
-        return JsonUtility.FromJson<Player>(json);
+        Player player = JsonUtility.FromJson<Player>(json);
+        player.storedDeck = new List<Card>(player.deck);
+        return player;
     }
 
     public string ToJson()
     {
         return JsonUtility.ToJson(this);
     }
-    
+
     #region Deck
     public void CreateDeck()
     {
@@ -103,7 +111,7 @@ public class Player
         deck.RemoveAt(deck.Count - 1);
         return drawnCard;
     }
-    
+
 
     #endregion
 }

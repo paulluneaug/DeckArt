@@ -4,73 +4,84 @@ using UnityUtility.CustomAttributes;
 
 public class GameManager : MonoBehaviour
 {
+    public const int GAMES_TO_PLAY = 500;
+
     public Player player;
 
-    [Button(nameof(LoadPlayer))]
+    [Button(nameof(StartGames))]
     [SerializeField] private string m_referencePlayerJsonPath;
 
-    [NonSerialized] private Player player2;
-    
-    [NonSerialized]public int turnToPlay;
-    [NonSerialized]public bool gameOver;
+    [NonSerialized] private Player referencePlayer;
+
+    [NonSerialized] public int gamesToPlay = GAMES_TO_PLAY;
+    [NonSerialized] public bool gameOver;
 
     [NonSerialized] public int winRate;
 
     [NonSerialized] public Player currentPlayer, otherPlayer;
 
+    private void StartGames()
+    {
+        LoadReferencePlayer();
+
+        gamesToPlay = GAMES_TO_PLAY;
+        ResetGame();
+
+        while (!gameOver)
+        {
+            if (PlayTurn())
+            {
+                ResetGame();
+            }
+        }
+    }
 
     private void Awake()
     {
 
-        LoadPlayer();
-        Reset();
+        ResetGame();
     }
 
-    private void LoadPlayer()
+    private void LoadReferencePlayer()
     {
         TextAsset json = Resources.Load<TextAsset>(m_referencePlayerJsonPath);
-        player2 = Player.FromJson(json.text);
-        player2.deck.ForEach(card => { Debug.Log(card); });
+        referencePlayer = Player.FromJson(json.text);
     }
 
-    private void Update()
-    {
-        if(gameOver)
-            return;
-        PlayTurn();
-    }
-
-    public void PlayTurn()
+    public bool PlayTurn()
     {
         currentPlayer.StartTurn();
         currentPlayer.PlayCards();
         otherPlayer.TakeDamage(currentPlayer.Attack());
 
         if (otherPlayer.currentHealth <= 0)
+        {
             Win(currentPlayer);
+            return true;
+        }
 
         (currentPlayer, otherPlayer) = (otherPlayer, currentPlayer);
+        return false;
     }
 
     public void Win(Player winner)
     {
         winRate += winner == player ? 0 : 1;
         Debug.Log(winner == player ? "Player 1" : "Player 2");
-        Reset();
     }
 
-    private void Reset()
+    private void ResetGame()
     {
-        if (turnToPlay == 0)
+        if (--gamesToPlay == 0)
         {
             gameOver = true;
-            Debug.Log((float)winRate/turnToPlay);
+            Debug.Log((float)winRate / GAMES_TO_PLAY);
         }
 
-        player.Reset();
-        player2.Reset();
+        player.Reset(true);
+        referencePlayer.Reset(false);
 
         currentPlayer = player;
-        otherPlayer = player2;
+        otherPlayer = referencePlayer;
     }
 }
