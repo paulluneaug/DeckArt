@@ -1,9 +1,7 @@
-using NUnit.Framework.Internal.Commands;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityUtility.CustomAttributes;
-using UnityUtility.Extensions;
 using UnityUtility.Recorders;
 
 using Random = UnityEngine.Random;
@@ -15,11 +13,8 @@ public class GameManager : MonoBehaviour
     public Player player;
 
     [Button(nameof(StartGames))]
-    [SerializeField] private string m_referencePlayerJsonPath; 
-    
-    [SerializeField] private Transform m_cardDisplayParent;
-    [SerializeField] private GameObject m_prefabCardDisplay;
-
+    [SerializeField] private string m_referencePlayerJsonPath;
+    [SerializeField] private GraphicsManager m_graphicsManager;
 
     [NonSerialized] private Player referencePlayer;
 
@@ -53,6 +48,7 @@ public class GameManager : MonoBehaviour
                 ResetGame();
             }
         }
+        
         recorder.LogAllEvents();
     }
 
@@ -105,7 +101,11 @@ public class GameManager : MonoBehaviour
         {
             gameOver = true;
             Debug.Log((float)winRate / GAMES_TO_PLAY);
-            DisplayAllCards(AssetList.GetAllPossibleCards().cards);
+
+            List<Card> cards = AssetList.GetAllPossibleCards().cards;
+            m_graphicsManager.DisplayAllCards(cards);
+            m_graphicsManager.CreateGraph(cards);
+            cards.ForEach(x => x.score = 0);
         }
 
         player.Reset(true);
@@ -114,21 +114,5 @@ public class GameManager : MonoBehaviour
 
         (currentPlayer, otherPlayer) = Random.value > 0.5f ? (player, referencePlayer) : (referencePlayer, player);
     }
-
-    private void DisplayAllCards(List<Card> cards)
-    {
-        int childCount = m_cardDisplayParent.childCount;
-        for (int loop = 0; loop < childCount; loop++)
-        {
-            m_cardDisplayParent.GetChild(0).gameObject.Destroy();
-        }
-        
-        cards.Sort((x, y) => y.score.CompareTo(x.score));
-        
-        foreach (Card card in cards)
-        {
-            DisplayCard displayCard = Instantiate(m_prefabCardDisplay, m_cardDisplayParent).GetComponent<DisplayCard>();
-            displayCard.Init(card);
-        }
-    }
+    
 }
