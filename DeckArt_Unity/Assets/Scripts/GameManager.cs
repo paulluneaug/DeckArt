@@ -5,6 +5,11 @@ public class GameManager : MonoBehaviour
 {
     public Player player, player2;
     
+    public int turnToPlay;
+    public bool gameOver;
+
+    public int winRate;
+    
     [NonSerialized] public Player currentPlayer, otherPlayer;
 
 
@@ -15,6 +20,8 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
+        if(gameOver)
+            return;
         PlayTurn();
     }
 
@@ -32,12 +39,19 @@ public class GameManager : MonoBehaviour
 
     public void Win(Player winner)
     {
+        winRate += winner == player ? 0 : 1;
         Debug.Log(winner == player ? "Player 1" : "Player 2");
         Reset();
     }
 
     private void Reset()
     {
+        if (turnToPlay == 0)
+        {
+            gameOver = true;
+            Debug.Log((float)winRate/turnToPlay);
+        }
+
         player.Reset();
         player2.Reset();
         
