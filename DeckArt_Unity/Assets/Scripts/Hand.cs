@@ -1,5 +1,8 @@
+using System;
+using UnityEngine;
 using System.Collections.Generic;
 
+[Serializable]
 public class Hand
 {
     public List<Card> cards = new();

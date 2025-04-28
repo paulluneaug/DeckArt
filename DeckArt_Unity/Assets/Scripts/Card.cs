@@ -1,7 +1,28 @@
-using UnityEngine;
+using System;
+using UnityUtility.MathU;
 
+[Serializable]
 public class Card
 {
-    public int atk;
-    public int cost;
+    public const int MAX_COST = 6;
+
+    public string name;
+    public int attack;
+    public int defense;
+
+    [NonSerialized] public int cost;
+
+    public Card(string name, int atk, int def)
+    {
+        this.name = name;
+        this.attack = atk;
+        this.defense = def;
+
+        cost = ComputeCardCost(atk, def);
+    }
+
+    public static int ComputeCardCost(int attack, int defense)
+    {
+        return (int)MathUf.Floor((attack + defense) / 2.0f);
+    }
 }
