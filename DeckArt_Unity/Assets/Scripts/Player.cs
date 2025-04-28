@@ -10,6 +10,7 @@ public class Player
     
     public Hand hand;
     public Board board;
+    public Deck deck;
 
     public Player()
     {
@@ -20,7 +21,7 @@ public class Player
     {
         manaMax++;
         currentMana = manaMax;
-        //hand.AddCard(deck.draw())
+        hand.AddCard(deck.Draw());
     }
 
     public void PlayCards()
@@ -52,7 +53,7 @@ public class Player
 
         for (int loop = 0; loop < cardCountStart; loop++)
         {
-            //hand.AddCard(deck.draw())
+            hand.AddCard(deck.Draw());
         }
     }
 }
