@@ -8,7 +8,7 @@ public class Board
         int sum = 0;
         foreach (Card card in cards)
         {
-            sum += card.atk;
+            sum += card.attack;
         }
         return sum;
     }
