@@ -1,6 +1,10 @@
+using NUnit.Framework.Internal.Commands;
 using System;
 using UnityEngine;
 using UnityUtility.CustomAttributes;
+using UnityUtility.Recorders;
+
+using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
@@ -22,10 +26,19 @@ public class GameManager : MonoBehaviour
 
     private void StartGames()
     {
+        Recorder recorder = new Recorder();
+
+        recorder.AddEvent("Init");
+
         LoadReferencePlayer();
 
+        gameOver = false;
+        winRate = 0;
         gamesToPlay = GAMES_TO_PLAY;
+
         ResetGame();
+
+        recorder.AddEvent("Game loop");
 
         while (!gameOver)
         {
@@ -34,6 +47,7 @@ public class GameManager : MonoBehaviour
                 ResetGame();
             }
         }
+        recorder.LogAllEvents();
     }
 
     private void Awake()
@@ -52,7 +66,9 @@ public class GameManager : MonoBehaviour
     {
         currentPlayer.StartTurn();
         currentPlayer.PlayCards();
-        otherPlayer.TakeDamage(currentPlayer.Attack());
+        int damage = currentPlayer.Attack();
+        //Debug.Log($"Patate : {damage}");
+        otherPlayer.TakeDamage(damage);
 
         if (otherPlayer.currentHealth <= 0)
         {
@@ -66,8 +82,10 @@ public class GameManager : MonoBehaviour
 
     public void Win(Player winner)
     {
-        winRate += winner == player ? 0 : 1;
-        Debug.Log(winner == player ? "Player 1" : "Player 2");
+        //Debug.Log($"{player.currentHealth} - {referencePlayer.currentHealth}");
+
+        winRate += winner == player ? 1 : 0;
+        //Debug.Log(winner == player ? "Player 1" : "Player 2");
     }
 
     private void ResetGame()
@@ -81,7 +99,7 @@ public class GameManager : MonoBehaviour
         player.Reset(true);
         referencePlayer.Reset(false);
 
-        currentPlayer = player;
-        otherPlayer = referencePlayer;
+
+        (currentPlayer, otherPlayer) = Random.value > 0.5f ? (player, referencePlayer) : (referencePlayer, player);
     }
 }

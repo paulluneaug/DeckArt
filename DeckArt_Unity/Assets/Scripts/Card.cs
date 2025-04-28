@@ -30,4 +30,9 @@ public class Card
     {
         return (int)MathUf.Floor((attack + defense) / 2.0f);
     }
+
+    public void ComputeCost()
+    {
+        cost = ComputeCardCost(attack, defense);
+    }
 }

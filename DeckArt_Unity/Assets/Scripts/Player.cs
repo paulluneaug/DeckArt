@@ -7,11 +7,12 @@ using UnityUtility.Extensions;
 public class Player
 {
     public const int DECK_SIZE = 30;
+    public const int MAX_HEALTH = 30;
 
     public List<Card> deck;
     public string name;
 
-    [NonSerialized] public int maxHealth, currentHealth;
+    [NonSerialized] public int currentHealth;
     [NonSerialized] public int manaMax, currentMana;
     [NonSerialized] public int cardCountStart = 5;
 
@@ -45,6 +46,7 @@ public class Player
             currentMana -= cardToPlay.cost;
 
             cardToPlay = hand.GetCardToPlay(currentMana);
+
         }
     }
 
@@ -60,7 +62,8 @@ public class Player
 
     public void Reset(bool recreateDeck)
     {
-        currentHealth = maxHealth;
+        currentHealth = MAX_HEALTH;
+        manaMax = 0;
         hand.Reset();
         board.Reset();
 
@@ -72,7 +75,7 @@ public class Player
         {
             deck = new List<Card>(storedDeck);
         }
-
+        deck.Shuffle();
         for (int loop = 0; loop < cardCountStart; loop++)
         {
             hand.AddCard(Draw());
@@ -82,6 +85,7 @@ public class Player
     public static Player FromJson(string json)
     {
         Player player = JsonUtility.FromJson<Player>(json);
+        player.deck.ForEach(card => card.ComputeCost());
         player.storedDeck = new List<Card>(player.deck);
         return player;
     }
