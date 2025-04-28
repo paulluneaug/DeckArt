@@ -4,13 +4,15 @@ using Unity.VisualScripting;
 [Serializable]
 public class Player
 {
-    public int maxHealth, currentHealth; 
-    public int manaMax, currentMana;
-    public int cardCountStart;
+    [NonSerialized] public int maxHealth, currentHealth; 
+    [NonSerialized] public int manaMax, currentMana;
+    [NonSerialized] public int cardCountStart = 5;
     
-    public Hand hand;
-    public Board board;
-    public Deck deck;
+    [NonSerialized] public Hand hand;
+    [NonSerialized] public Board board;
+    [NonSerialized] public Deck deck;
+
+    public string name;
 
     public Player()
     {
