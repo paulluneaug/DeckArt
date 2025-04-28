@@ -22,4 +22,12 @@ public class Board
     {
         cards.Clear();
     }
+
+    public void Win(bool hasWon)
+    {
+        foreach (Card card in cards)
+        {
+            card.UpdateScore(hasWon);
+        }
+    }
 }

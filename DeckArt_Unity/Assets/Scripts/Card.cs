@@ -11,6 +11,7 @@ public class Card
     public int defense;
 
     [NonSerialized] public int cost;
+    [NonSerialized] public int score;
 
     public Card(string name, int atk, int def)
     {
@@ -23,7 +24,7 @@ public class Card
 
     public override string ToString()
     {
-        return name;
+        return $"Name : {name} | Score : {score}";
     }
 
     public static int ComputeCardCost(int attack, int defense)
@@ -34,5 +35,10 @@ public class Card
     public void ComputeCost()
     {
         cost = ComputeCardCost(attack, defense);
+    }
+
+    public void UpdateScore(bool add)
+    {
+        score += add ? 1 : -1;
     }
 }

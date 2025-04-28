@@ -60,6 +60,11 @@ public class Player
         currentHealth -= damage;
     }
 
+    public void Win(bool hasWon)
+    {
+        board.Win(hasWon);
+    }
+
     public void Reset(bool recreateDeck)
     {
         currentHealth = MAX_HEALTH;

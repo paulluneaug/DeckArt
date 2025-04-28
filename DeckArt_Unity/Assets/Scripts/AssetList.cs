@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 [Serializable]
 public class AssetList
@@ -36,5 +37,20 @@ public class AssetList
             }
         }
         return instance;
+    }
+
+    public override string ToString()
+    {
+        string line = "";
+
+        List<Card> sortedCards = new List<Card>(cards);
+        sortedCards.Sort((x, y) => y.score.CompareTo(x.score));
+        
+        foreach (Card card in sortedCards)
+        {
+            line += card.ToString() + "\n";
+        }
+
+        return line;
     }
 }

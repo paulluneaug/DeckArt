@@ -8,7 +8,7 @@ using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
-    public const int GAMES_TO_PLAY = 500;
+    public const int GAMES_TO_PLAY = 10000;
 
     public Player player;
 
@@ -83,8 +83,13 @@ public class GameManager : MonoBehaviour
     public void Win(Player winner)
     {
         //Debug.Log($"{player.currentHealth} - {referencePlayer.currentHealth}");
-
-        winRate += winner == player ? 1 : 0;
+        if (winner == player)
+        {
+            player.Win(true);
+            winRate++;
+        }
+        else
+            player.Win(false);
         //Debug.Log(winner == player ? "Player 1" : "Player 2");
     }
 
@@ -94,6 +99,7 @@ public class GameManager : MonoBehaviour
         {
             gameOver = true;
             Debug.Log((float)winRate / GAMES_TO_PLAY);
+            Debug.Log(AssetList.GetAllPossibleCards());
         }
 
         player.Reset(true);
