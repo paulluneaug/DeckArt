@@ -48,10 +48,11 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < m_iterationCount; i++)
         {
             float winRate = PlayIteration();
+            Metrics.GetInstance().WriteData("WinRate", winRate.ToString());
             FinishIteration(winRate, i);
         }
         
-        Metrics.GetInstance().WriteShit("shit");
+        Metrics.GetInstance().FlushAll();
         
         SavePlayerDeck();
     }
