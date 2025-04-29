@@ -373,10 +373,10 @@ MonoBehaviour:
   m_iterationCount: 500
   m_modifiedCardsPerIteration: 1
   m_decreaseCardsModified: 0
-  m_saveJsonPathFormat: Assets/Resources/player_{0}.json
-  m_playerJsonPath: player_41
-  m_referencePlayerJsonPath: player_40
-  m_iterationsOnDeck: 42
+  m_saveJsonPathFormat: Assets/Resources/Players/player_{0}.json
+  m_playerJsonPath: Players/player_56
+  m_referencePlayerJsonPath: Players/best_player
+  m_iterationsOnDeck: 57
 --- !u!4 &1008919564
 Transform:
   m_ObjectHideFlags: 0
