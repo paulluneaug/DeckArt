@@ -25,6 +25,8 @@ public class Player
     [NonSerialized] public List<Card> storedDeck;
     [NonSerialized] public List<Card> bestDeck;
 
+    [NonSerialized] public float averageCost, averageAtk, averageDef;
+
     public Player()
     {
         hand = new Hand();
@@ -98,6 +100,19 @@ public class Player
             RestoreDeck(false);
         }
         deck.Shuffle();
+        
+        averageCost = 0;
+        averageAtk = 0;
+        averageDef = 0;
+        foreach (Card card in deck)
+        {
+            averageCost += card.cost;
+            averageAtk += card.attack;
+            averageDef += card.defense;
+        }
+        averageCost /= deck.Count;
+        averageAtk /= deck.Count;
+        averageDef /= deck.Count;
 
         for (int loop = 0; loop < cardCountStart; loop++)
         {

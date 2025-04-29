@@ -1,16 +1,16 @@
 using System.Collections.Generic;
 using System.IO;
+using System.IO.IsolatedStorage;
 
 public class Metrics
 {
     private static Metrics _instance;
-    private readonly StreamWriter m_writer;
+    private StreamWriter m_writer;
 
     private Dictionary<string, string> m_dictionary = new();
 
     private Metrics()
     {
-        m_writer = new StreamWriter("Assets/Resources/Metrics.txt");
     }
 
     public static Metrics GetInstance()
@@ -47,6 +47,8 @@ public class Metrics
 
     public void FlushAll()
     {
+        m_writer = File.CreateText("Assets/Resources/Metrics.txt");
+
         foreach (KeyValuePair<string, string> line in m_dictionary)
         {
             m_writer.WriteLine($"{line.Key}\n");

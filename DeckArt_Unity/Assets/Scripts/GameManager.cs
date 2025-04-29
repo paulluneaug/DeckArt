@@ -35,6 +35,8 @@ public class GameManager : MonoBehaviour
 
     [NonSerialized] public Player currentPlayer, otherPlayer;
 
+    [NonSerialized] private float m_averageTurnThisIteration;
+
 
     private void StartIterations()
     {
@@ -44,11 +46,15 @@ public class GameManager : MonoBehaviour
 
         LoadPlayers();
         previousWinRate = 0.0f;
+        
 
         for (int i = 0; i < m_iterationCount; i++)
         {
             float winRate = PlayIteration();
-            Metrics.GetInstance().WriteData("WinRate", winRate.ToString());
+            Metrics.GetInstance().WriteData("Average Cost", player.averageCost.ToString());
+            Metrics.GetInstance().WriteData("Average Attack", player.averageAtk.ToString());
+            Metrics.GetInstance().WriteData("Average Defense", player.averageDef.ToString());
+            Metrics.GetInstance().WriteData("Average Turn This Iteration", m_averageTurnThisIteration.ToString());
             FinishIteration(winRate, i);
         }
         
@@ -88,6 +94,8 @@ public class GameManager : MonoBehaviour
     {
         InitIteration();
 
+        m_averageTurnThisIteration = 0;
+
         while (!gameOver)
         {
             if (PlayTurn())
@@ -96,7 +104,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
-
+        m_averageTurnThisIteration /= m_gamesToPlayPerIterations;
         float winRate = (float)winCount / m_gamesToPlayPerIterations;
         return winRate;
     }
@@ -114,6 +122,9 @@ public class GameManager : MonoBehaviour
             previousWinRate = winRate;
         }
         Debug.LogError($"WIN RATE : {winRate} vs {previousWinRate}");
+        Metrics.GetInstance().WriteData("WinRate", winRate.ToString());
+        Metrics.GetInstance().WriteData("Best WinRate", previousWinRate.ToString());
+
 
         player.IterateOnDeck(m_decreaseCardsModified ? MathUf.CeilToInt((1.0f - ((float)iteration / m_iterationCount)) * m_modifiedCardsPerIteration) : m_modifiedCardsPerIteration);
     }
@@ -125,6 +136,8 @@ public class GameManager : MonoBehaviour
         int damage = currentPlayer.Attack();
         //Debug.Log($"Patate : {damage}");
         otherPlayer.TakeDamage(damage);
+
+        m_averageTurnThisIteration++;
 
         if (otherPlayer.currentHealth <= 0)
         {

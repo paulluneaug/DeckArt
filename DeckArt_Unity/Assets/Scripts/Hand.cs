@@ -49,4 +49,16 @@ public class Hand
     {
         playedCards.ForEach(card => card.score += scoreFactor);
     }
+
+    public float AverageCost()
+    {
+        int sum = 0;
+
+        foreach (Card card in cards)
+        {
+            sum += card.cost;
+        }
+
+        return sum / (float)cards.Count;
+    }
 }
