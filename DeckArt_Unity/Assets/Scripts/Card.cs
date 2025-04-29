@@ -20,7 +20,7 @@ public class Card
         this.defense = def;
 
         cost = ComputeCardCost(atk, def);
-        score = 10.0f;
+        ResetScore();
     }
 
     public override string ToString()
@@ -50,5 +50,10 @@ public class Card
     public override int GetHashCode()
     {
         return HashCode.Combine(attack, defense);
+    }
+
+    public void ResetScore()
+    {
+        score = 10.0f;
     }
 }

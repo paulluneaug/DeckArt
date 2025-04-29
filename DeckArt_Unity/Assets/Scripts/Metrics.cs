@@ -59,4 +59,9 @@ public class Metrics
 
         m_writer.Close();
     }
+
+    public void ClearMetrics()
+    {
+        m_dictionary.Clear();
+    }
 }
