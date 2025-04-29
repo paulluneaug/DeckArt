@@ -146,7 +146,7 @@ public class Player
 
     public void IterateOnDeck(int cardsToModify)
     {
-        Debug.LogError(cardsToModify);
+        //Debug.LogError(cardsToModify);
         RestoreDeck(true);
         deck.Sort(CardsComparisons.ScoreComparer);
 
@@ -157,11 +157,11 @@ public class Player
             Debug.Log($"Replaced {card} ({card.score}) with {deck[i]}");
         }
 
-        Debug.LogWarning("Best Cards : ");
-        for (int i = 1; i <= 10; i++)
-        {
-            Debug.LogWarning($" - {deck[^i]}({deck[^i].score})");
-        }
+        //Debug.LogWarning("Best Cards : ");
+        //for (int i = 1; i <= 10; i++)
+        //{
+        //    Debug.LogWarning($" - {deck[^i]}({deck[^i].score})");
+        //}
 
         SaveDeck(false);
     }

@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1cbc3c9e1d5e0d8468592236d2a8e7b3, type: 3}
   m_Name: ScoreFactorsHolder
   m_EditorClassIdentifier: 
-  m_winningCardRewardFactor: 20
+  m_winningCardRewardFactor: 10
   m_losingCardRewardFactor: -10
   m_playedCardRewardFactor: 0
