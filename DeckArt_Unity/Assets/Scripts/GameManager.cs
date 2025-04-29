@@ -30,6 +30,8 @@ public class GameManager : MonoBehaviour
 
         recorder.AddEvent("Init");
 
+        Metrics.GetInstance().WriteShit("shit");
+
         LoadReferencePlayer();
 
         gameOver = false;
