@@ -56,5 +56,7 @@ public class Metrics
             m_writer.WriteLine(m_writer.NewLine);
         }
         m_writer.Flush();
+
+        m_writer.Close();
     }
 }

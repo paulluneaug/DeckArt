@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Runtime.CompilerServices;
 using UnityEngine;
@@ -53,10 +54,10 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < m_iterationCount; i++)
         {
             float winRate = PlayIteration();
-            Metrics.GetInstance().WriteData("Average Cost", player.averageCost.ToString());
-            Metrics.GetInstance().WriteData("Average Attack", player.averageAtk.ToString());
-            Metrics.GetInstance().WriteData("Average Defense", player.averageDef.ToString());
-            Metrics.GetInstance().WriteData("Average Turn This Iteration", m_averageTurnThisIteration.ToString());
+            Metrics.GetInstance().WriteData("Average Cost", player.averageCost.ToString("R", CultureInfo.InvariantCulture));
+            Metrics.GetInstance().WriteData("Average Attack", player.averageAtk.ToString("R", CultureInfo.InvariantCulture));
+            Metrics.GetInstance().WriteData("Average Defense", player.averageDef.ToString("R", CultureInfo.InvariantCulture));
+            Metrics.GetInstance().WriteData("Average Game Duration", m_averageTurnThisIteration.ToString("R", CultureInfo.InvariantCulture));
             FinishIteration(winRate, i);
         }
         
@@ -124,8 +125,8 @@ public class GameManager : MonoBehaviour
             previousWinRate = winRate;
         }
         Debug.LogError($"WIN RATE : {winRate} vs {previousWinRate}");
-        Metrics.GetInstance().WriteData("WinRate", winRate.ToString());
-        Metrics.GetInstance().WriteData("Best WinRate", previousWinRate.ToString());
+        Metrics.GetInstance().WriteData("WinRate", winRate.ToString("R", CultureInfo.InvariantCulture));
+        Metrics.GetInstance().WriteData("Best WinRate", previousWinRate.ToString("R", CultureInfo.InvariantCulture));
 
 
         player.IterateOnDeck(m_decreaseCardsModified ? MathUf.CeilToInt((1.0f - ((float)iteration / m_iterationCount)) * m_modifiedCardsPerIteration) : m_modifiedCardsPerIteration);
