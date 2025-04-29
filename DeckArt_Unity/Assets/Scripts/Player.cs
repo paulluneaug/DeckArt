@@ -73,15 +73,38 @@ public class Player
     {
         deck = new List<Card>(restoreBest ? bestDeck : storedDeck);
     }
+    
 
-    public int Attack()
+    public int Attack(int index)
     {
-        return board.GetAttack();
+        return board.GetAttack(index);
+    }
+
+    public int Block(Board otherBoard)
+    {
+        int attackingCardIndex = 0;
+        foreach (Card cardWithProvoc in board.GetProvocCards())
+        {
+            while (cardWithProvoc.currentDefense > 0 && attackingCardIndex < otherBoard.cards.Count)
+            {
+                Card attackingCard = otherBoard.cards[attackingCardIndex];
+                cardWithProvoc.Block(attackingCard);
+                
+                attackingCardIndex++;
+            }
+        }
+        
+        return attackingCardIndex;
     }
 
     public void TakeDamage(int damage)
     {
         currentHealth -= damage;
+    }
+
+    public void EndAttack()
+    {
+        board.EndAttack();
     }
 
     public void Reset(bool recreateDeck)
@@ -131,7 +154,7 @@ public class Player
 
     public string ToJson()
     {
-        return JsonUtility.ToJson(this);
+        return JsonUtility.ToJson(this, true);
     }
 
     #region Deck

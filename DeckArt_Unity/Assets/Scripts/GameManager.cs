@@ -135,9 +135,11 @@ public class GameManager : MonoBehaviour
     {
         currentPlayer.StartTurn();
         currentPlayer.PlayCards();
-        int damage = currentPlayer.Attack();
-        //Debug.Log($"Patate : {damage}");
+        int attackingCardLeft = otherPlayer.Block(currentPlayer.board);
+        int damage = currentPlayer.Attack(attackingCardLeft);
         otherPlayer.TakeDamage(damage);
+        currentPlayer.EndAttack();
+        otherPlayer.EndAttack();
 
         m_averageTurnThisIteration++;
 

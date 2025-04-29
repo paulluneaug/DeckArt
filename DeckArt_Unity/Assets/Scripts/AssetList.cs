@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityUtility.MathU;
 
 [Serializable]
 public class AssetList
@@ -28,13 +29,25 @@ public class AssetList
             {
                 for (int defence = 1; defence <= Card.MAX_COST * 3; defence++)
                 {
-                    if (Card.ComputeCardCost(attack, defence) <= Card.MAX_COST)
+                    for (int loop = 0; loop < MathF.Pow(2, Enum.GetValues(typeof(Competences)).Length); loop++)
                     {
-                        instance.AddCard(new Card($"Card_{attack}_{defence}", attack, defence));
+                        Competences competences = (Competences)loop;
+                        if (Card.ComputeCardCost(attack, defence, competences) <= Card.MAX_COST)
+                        {
+                            instance.AddCard(new Card(attack, defence, competences));
+                        }
                     }
                 }
             }
         }
         return instance;
+    }
+    
+    [Flags]
+    public enum Competences
+    {
+        Provoc = 1 << 0,
+        //Deferlement = 1 << 1, // Piètinement
+        //Distortion = 1 << 2, // Imblocable sauf par distortion
     }
 }

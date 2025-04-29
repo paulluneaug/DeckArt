@@ -9,20 +9,45 @@ public class Card
     public string name;
     public int attack;
     public int defense;
+    public AssetList.Competences competences;
 
     [NonSerialized] public int cost;
     [NonSerialized] public float score;
+    [NonSerialized] public int currentDefense;
 
-    public Card(string name, int atk, int def)
+    public Card(int atk, int def, AssetList.Competences competences)
     {
-        this.name = name;
         this.attack = atk;
         this.defense = def;
+        this.competences = competences;
+        Rename();
 
-        cost = ComputeCardCost(atk, def);
+        EndTurn();
+        cost = ComputeCardCost(atk, def, competences);
         score = 10.0f;
     }
 
+    public void Rename()
+    {
+        name = $"Card_{attack}_{defense}_{competences.ToString()}";
+    }
+
+    public bool HasCompetence(AssetList.Competences competenceToTest)
+    {
+        return HasCompetence(this.competences, competenceToTest);
+    }
+
+    public void Block(Card card)
+    {
+        currentDefense -= card.attack;
+        card.currentDefense -= attack;
+    }
+
+    public void EndTurn()
+    {
+        currentDefense = defense;
+    }
+    
     public override string ToString()
     {
         return name;
@@ -37,18 +62,27 @@ public class Card
         return false;
     }
 
-    public static int ComputeCardCost(int attack, int defense)
+    public static int ComputeCardCost(int attack, int defense, AssetList.Competences competences)
     {
-        return (int)MathUf.Floor((attack + defense) / 2.0f);
+        int cost = (int)MathUf.Floor((attack + defense) / 2.0f);
+        cost += HasCompetence(competences, AssetList.Competences.Provoc) ? 1 : 0;
+        return cost;
     }
+    
+    public static bool HasCompetence(AssetList.Competences competences, AssetList.Competences competenceToTest)
+    {
+        return (competences & competenceToTest) != 0;
+    }
+
 
     public void ComputeCost()
     {
-        cost = ComputeCardCost(attack, defense);
+        Rename();
+        cost = ComputeCardCost(attack, defense, competences);
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(attack, defense);
+        return HashCode.Combine(attack, defense, competences);
     }
 }
