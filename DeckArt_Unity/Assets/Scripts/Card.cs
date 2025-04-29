@@ -11,6 +11,7 @@ public class Card
     public int defense;
 
     [NonSerialized] public int cost;
+    [NonSerialized] public float score;
 
     public Card(string name, int atk, int def)
     {
@@ -19,11 +20,21 @@ public class Card
         this.defense = def;
 
         cost = ComputeCardCost(atk, def);
+        score = 10.0f;
     }
 
     public override string ToString()
     {
         return name;
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is Card otherCard)
+        {
+            return otherCard.attack == attack && otherCard.defense == defense;
+        }
+        return false;
     }
 
     public static int ComputeCardCost(int attack, int defense)
@@ -34,5 +45,10 @@ public class Card
     public void ComputeCost()
     {
         cost = ComputeCardCost(attack, defense);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(attack, defense);
     }
 }

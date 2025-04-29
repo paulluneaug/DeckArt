@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityUtility.Extensions;
+
+using Random = UnityEngine.Random;
 
 [Serializable]
 public class Player
@@ -20,13 +23,16 @@ public class Player
     [NonSerialized] public Board board;
 
     [NonSerialized] public List<Card> storedDeck;
+    [NonSerialized] public List<Card> bestDeck;
 
     public Player()
     {
         hand = new Hand();
         board = new Board();
+    }
 
-
+    public void Init()
+    {
     }
 
     public void StartTurn()
@@ -41,6 +47,7 @@ public class Player
         Card cardToPlay = hand.GetCardToPlay(currentMana);
         while (cardToPlay != null)
         {
+            cardToPlay.score += ScoreFactorsHolder.Instance.PlayedCardRewardFactor;
             hand.RemoveCard(cardToPlay);
             board.AddCard(cardToPlay);
             currentMana -= cardToPlay.cost;
@@ -48,6 +55,21 @@ public class Player
             cardToPlay = hand.GetCardToPlay(currentMana);
 
         }
+    }
+
+    public void SaveDeck(bool asBest)
+    {
+        storedDeck = new List<Card>(deck);
+
+        if (asBest)
+        {
+            bestDeck = new List<Card>(deck);
+        }
+    }
+
+    public void RestoreDeck(bool restoreBest)
+    {
+        deck = new List<Card>(restoreBest ? bestDeck : storedDeck);
     }
 
     public int Attack()
@@ -73,9 +95,10 @@ public class Player
         }
         else
         {
-            deck = new List<Card>(storedDeck);
+            RestoreDeck(false);
         }
         deck.Shuffle();
+
         for (int loop = 0; loop < cardCountStart; loop++)
         {
             hand.AddCard(Draw());
@@ -85,8 +108,9 @@ public class Player
     public static Player FromJson(string json)
     {
         Player player = JsonUtility.FromJson<Player>(json);
+
         player.deck.ForEach(card => card.ComputeCost());
-        player.storedDeck = new List<Card>(player.deck);
+        player.SaveDeck(true);
         return player;
     }
 
@@ -98,15 +122,11 @@ public class Player
     #region Deck
     public void CreateDeck()
     {
-        deck = new List<Card>(DECK_SIZE);
 
         AssetList allCards = AssetList.GetAllPossibleCards();
 
-        allCards.cards.Shuffle();
-        for (int i = 0; i < DECK_SIZE; i++)
-        {
-            deck.Add(allCards.cards[i]);
-        }
+        deck = allCards.cards.ChooseWeighted(DECK_SIZE, (Card card) => card.score);
+
     }
 
     public Card Draw()
@@ -116,6 +136,89 @@ public class Player
         return drawnCard;
     }
 
-
+    public void RewardWinningCards(float scoreFactor)
+    {
+        hand.RewardPlayedCards(scoreFactor);
+    }
     #endregion
+
+
+
+    public void IterateOnDeck(int cardsToModify)
+    {
+        Debug.LogError(cardsToModify);
+        RestoreDeck(true);
+        deck.Sort(CardsComparisons.ScoreComparer);
+
+        for (int i = 0; i < cardsToModify; i++)
+        {
+            Card card = deck[i];
+            deck[i] = GetCardToAdd(deck);
+            Debug.Log($"Replaced {card} ({card.score}) with {deck[i]}");
+        }
+
+        Debug.LogWarning("Best Cards : ");
+        for (int i = 1; i <= 10; i++)
+        {
+            Debug.LogWarning($" - {deck[^i]}({deck[^i].score})");
+        }
+
+        SaveDeck(false);
+    }
+
+    private Card GetCardToAdd(List<Card> currentDeck)
+    {
+        Card card = null;
+
+        AssetList allCards = AssetList.GetAllPossibleCards();
+
+        while (card == null)
+        {
+            card = allCards.cards[Random.Range(0, allCards.cards.Count - 1)];
+            if (currentDeck.Contains(card))
+            {
+                card = null;
+                continue;
+            }
+        }
+        return card;
+    }
+}
+
+public static class EnumerableExtension
+{
+    public static List<T> ChooseWeighted<T>(this IList<T> values, int count, Func<T, float> weightSelector)
+    {
+        List<T> result = new List<T>(count);
+
+        float weightSum = values.Sum(x => weightSelector(x));
+        HashSet<int> selectedIndices = new HashSet<int>();
+        for (int i = 0; i < count; i++)
+        {
+            int selectedIndex;
+            do
+            {
+                selectedIndex = GetWeightedIndex(values, weightSelector, Random.Range(0, weightSum));
+            } while (selectedIndices.Contains(selectedIndex));
+
+            selectedIndices.Add(selectedIndex);
+            result.Add(values[selectedIndex]);
+        }
+
+        return result;
+    }
+
+    private static int GetWeightedIndex<T>(IList<T> values, Func<T, float> weightSelector, float randomValue)
+    {
+        float sum = 0;
+        for (int i = 0; i < values.Count; i++)
+        {
+            sum += weightSelector(values[i]);
+            if (sum >= randomValue)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
 }

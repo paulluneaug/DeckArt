@@ -6,7 +6,8 @@ using UnityUtility.Extensions;
 [Serializable]
 public class Hand
 {
-    public List<Card> cards = new();
+    [NonSerialized] public List<Card> cards = new();
+    [NonSerialized] public List<Card> playedCards = new();
 
     public Card GetCardToPlay(int maxMana)
     {
@@ -26,7 +27,7 @@ public class Hand
         //cards.Insert(index, cardToAdd);
 
         cards.Add(cardToAdd);
-        cards.Sort((card0, card1) => card0.cost.CompareTo(card1.cost));
+        cards.Sort(CardsComparisons.CostComparer);
 
         //Debug.LogError($"{cards.EnumerableToString()}");
 
@@ -35,10 +36,17 @@ public class Hand
     public void RemoveCard(Card cardToRemove)
     {
         cards.Remove(cardToRemove);
+        playedCards.Add(cardToRemove);
     }
 
     public void Reset()
     {
         cards.Clear();
+        playedCards.Clear();
+    }
+
+    public void RewardPlayedCards(float scoreFactor)
+    {
+        playedCards.ForEach(card => card.score += scoreFactor);
     }
 }

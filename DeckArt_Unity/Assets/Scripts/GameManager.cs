@@ -1,44 +1,89 @@
-using NUnit.Framework.Internal.Commands;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityUtility.CustomAttributes;
+using UnityUtility.MathU;
 using UnityUtility.Recorders;
-
+using UnityUtility.Utils;
 using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
-    public const int GAMES_TO_PLAY = 500;
+    [Button(nameof(StartIterations))]
+    [Button(nameof(PlayOneIteration))]
+    [SerializeField] public int m_gamesToPlayPerIterations = 500;
+    [SerializeField] public int m_iterationCount = 5;
+    [SerializeField] public int m_modifiedCardsPerIteration = 5;
+    [SerializeField] public bool m_decreaseCardsModified = false;
 
-    public Player player;
+    [Title("JSON Paths")]
 
-    [Button(nameof(StartGames))]
+    [SerializeField] private string m_saveJsonPathFormat;
+    [SerializeField] private string m_playerJsonPath;
     [SerializeField] private string m_referencePlayerJsonPath;
 
-    [NonSerialized] private Player referencePlayer;
+    [SerializeField, HideInInspector] public int m_iterationsOnDeck = 0;
+    [NonSerialized] private Player referencePlayer, player;
 
-    [NonSerialized] public int gamesToPlay = GAMES_TO_PLAY;
+    [NonSerialized] public int gamesToPlay;
     [NonSerialized] public bool gameOver;
 
-    [NonSerialized] public int winRate;
+    [NonSerialized] public int winCount;
+    [NonSerialized] public float previousWinRate;
 
     [NonSerialized] public Player currentPlayer, otherPlayer;
 
-    private void StartGames()
+
+    private void StartIterations()
     {
         Recorder recorder = new Recorder();
 
         recorder.AddEvent("Init");
 
-        LoadReferencePlayer();
+        LoadPlayers();
+        previousWinRate = 0.0f;
 
-        gameOver = false;
-        winRate = 0;
-        gamesToPlay = GAMES_TO_PLAY;
+        for (int i = 0; i < m_iterationCount; i++)
+        {
+            float winRate = PlayIteration();
+            FinishIteration(winRate, i);
+        }
 
-        ResetGame();
+        SavePlayerDeck();
+    }
 
-        recorder.AddEvent("Game loop");
+    private void SavePlayerDeck()
+    {
+        string playerDeckJson = player.ToJson();
+        string savePath = string.Format(m_saveJsonPathFormat, m_iterationsOnDeck);
+        File.WriteAllText(savePath, playerDeckJson);
+
+        m_iterationsOnDeck++;
+    }
+
+    private void LoadPlayers()
+    {
+        TextAsset referencePlayerJson = Resources.Load<TextAsset>(m_referencePlayerJsonPath);
+        referencePlayer = Player.FromJson(referencePlayerJson.text);
+        referencePlayer.Init();
+
+        TextAsset playerJson = Resources.Load<TextAsset>(m_playerJsonPath);
+        player = Player.FromJson(playerJson.text);
+        player.Init();
+    }
+
+    private void PlayOneIteration()
+    {
+        LoadPlayers();
+        float iterationWinRate = PlayIteration();
+        Debug.LogError($"WIN RATE : {iterationWinRate}");
+    }
+
+    private float PlayIteration()
+    {
+        InitIteration();
 
         while (!gameOver)
         {
@@ -47,22 +92,30 @@ public class GameManager : MonoBehaviour
                 ResetGame();
             }
         }
-        recorder.LogAllEvents();
+
+
+        float winRate = (float)winCount / m_gamesToPlayPerIterations;
+        return winRate;
     }
 
-    private void Awake()
+    private void FinishIteration(float winRate, int iteration)
     {
+        if (winRate < previousWinRate)
+        {
+            player.RestoreDeck(true);
+        }
+        else
+        {
+            player.RestoreDeck(false);
+            player.SaveDeck(true);
+            previousWinRate = winRate;
+        }
+        Debug.LogError($"WIN RATE : {winRate} vs {previousWinRate}");
 
-        ResetGame();
+        player.IterateOnDeck(m_decreaseCardsModified ? MathUf.CeilToInt((1.0f - ((float)iteration / m_iterationCount)) * m_modifiedCardsPerIteration) : m_modifiedCardsPerIteration);
     }
 
-    private void LoadReferencePlayer()
-    {
-        TextAsset json = Resources.Load<TextAsset>(m_referencePlayerJsonPath);
-        referencePlayer = Player.FromJson(json.text);
-    }
-
-    public bool PlayTurn()
+    private bool PlayTurn()
     {
         currentPlayer.StartTurn();
         currentPlayer.PlayCards();
@@ -72,7 +125,7 @@ public class GameManager : MonoBehaviour
 
         if (otherPlayer.currentHealth <= 0)
         {
-            Win(currentPlayer);
+            Win(currentPlayer, otherPlayer);
             return true;
         }
 
@@ -80,12 +133,24 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
-    public void Win(Player winner)
+    public void Win(Player winner, Player loser)
     {
         //Debug.Log($"{player.currentHealth} - {referencePlayer.currentHealth}");
 
-        winRate += winner == player ? 1 : 0;
+        winCount += winner == player ? 1 : 0;
+        winner.RewardWinningCards(ScoreFactorsHolder.Instance.WinningCardRewardFactor);
+        loser.RewardWinningCards(ScoreFactorsHolder.Instance.LosingCardRewardFactor);
         //Debug.Log(winner == player ? "Player 1" : "Player 2");
+    }
+
+    private void InitIteration()
+    {
+        gameOver = false;
+        winCount = 0;
+        gamesToPlay = m_gamesToPlayPerIterations;
+
+        player.deck.ForEach(card => { card.score = 10.0f; });
+        ResetGame();
     }
 
     private void ResetGame()
@@ -93,10 +158,9 @@ public class GameManager : MonoBehaviour
         if (--gamesToPlay == 0)
         {
             gameOver = true;
-            Debug.Log((float)winRate / GAMES_TO_PLAY);
         }
 
-        player.Reset(true);
+        player.Reset(false);
         referencePlayer.Reset(false);
 
 
