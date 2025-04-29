@@ -47,6 +47,8 @@ public class GameManager : MonoBehaviour
         LoadPlayers();
         previousWinRate = 0.0f;
         
+        Metrics.GetInstance().WriteData("Game / Iteration", m_gamesToPlayPerIterations.ToString());
+        Metrics.GetInstance().WriteData("Iteration Nb", m_iterationCount.ToString());
 
         for (int i = 0; i < m_iterationCount; i++)
         {
