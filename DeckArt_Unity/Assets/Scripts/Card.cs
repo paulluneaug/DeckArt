@@ -24,7 +24,7 @@ public class Card
 
         EndTurn();
         cost = ComputeCardCost(atk, def, competences);
-        score = 10.0f;
+        ResetScore();
     }
 
     public void Rename()
@@ -57,7 +57,7 @@ public class Card
     {
         if (obj is Card otherCard)
         {
-            return otherCard.attack == attack && otherCard.defense == defense;
+            return otherCard.attack == attack && otherCard.defense == defense && otherCard.competences == competences;
         }
         return false;
     }
@@ -84,5 +84,10 @@ public class Card
     public override int GetHashCode()
     {
         return HashCode.Combine(attack, defense, competences);
+    }
+
+    public void ResetScore()
+    {
+        score = 10.0f;
     }
 }

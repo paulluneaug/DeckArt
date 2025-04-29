@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Runtime.CompilerServices;
 using UnityEngine;
@@ -46,21 +47,25 @@ public class GameManager : MonoBehaviour
 
         LoadPlayers();
         previousWinRate = 0.0f;
-        
-        Metrics.GetInstance().WriteData("Game / Iteration", m_gamesToPlayPerIterations.ToString());
-        Metrics.GetInstance().WriteData("Iteration Nb", m_iterationCount.ToString());
+
+        Metrics metrics = Metrics.GetInstance();
+        metrics.ClearMetrics();
+        metrics.WriteData("Games per iteration", m_gamesToPlayPerIterations.ToString());
+        metrics.WriteData("Iteration Count", m_iterationCount.ToString());
 
         for (int i = 0; i < m_iterationCount; i++)
         {
             float winRate = PlayIteration();
-            Metrics.GetInstance().WriteData("Average Cost", player.averageCost.ToString());
-            Metrics.GetInstance().WriteData("Average Attack", player.averageAtk.ToString());
-            Metrics.GetInstance().WriteData("Average Defense", player.averageDef.ToString());
-            Metrics.GetInstance().WriteData("Average Turn This Iteration", m_averageTurnThisIteration.ToString());
+
+            metrics.WriteData("Average Cost", player.averageCost.ToString("R", CultureInfo.InvariantCulture));
+            metrics.WriteData("Average Attack", player.averageAtk.ToString("R", CultureInfo.InvariantCulture));
+            metrics.WriteData("Average Defense", player.averageDef.ToString("R", CultureInfo.InvariantCulture));
+            metrics.WriteData("Average Game Duration", m_averageTurnThisIteration.ToString("R", CultureInfo.InvariantCulture));
+
             FinishIteration(winRate, i);
         }
-        
-        Metrics.GetInstance().FlushAll();
+
+        metrics.FlushAll();
         
         SavePlayerDeck();
     }
@@ -124,8 +129,8 @@ public class GameManager : MonoBehaviour
             previousWinRate = winRate;
         }
         Debug.LogError($"WIN RATE : {winRate} vs {previousWinRate}");
-        Metrics.GetInstance().WriteData("WinRate", winRate.ToString());
-        Metrics.GetInstance().WriteData("Best WinRate", previousWinRate.ToString());
+        Metrics.GetInstance().WriteData("WinRate", winRate.ToString("R", CultureInfo.InvariantCulture));
+        Metrics.GetInstance().WriteData("Best WinRate", previousWinRate.ToString("R", CultureInfo.InvariantCulture));
 
 
         player.IterateOnDeck(m_decreaseCardsModified ? MathUf.CeilToInt((1.0f - ((float)iteration / m_iterationCount)) * m_modifiedCardsPerIteration) : m_modifiedCardsPerIteration);
@@ -169,7 +174,8 @@ public class GameManager : MonoBehaviour
         winCount = 0;
         gamesToPlay = m_gamesToPlayPerIterations;
 
-        player.deck.ForEach(card => { card.score = 10.0f; });
+        AssetList.GetAllPossibleCards().cards.ForEach(card => { card.ResetScore(); });
+        player.deck.ForEach(card => { card.ResetScore(); });
         ResetGame();
     }
 
