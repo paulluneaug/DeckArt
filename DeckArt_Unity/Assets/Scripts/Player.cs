@@ -26,6 +26,8 @@ public class Player
     [NonSerialized] public List<Card> bestDeck;
 
     [NonSerialized] public float averageCost, averageAtk, averageDef;
+    [NonSerialized] public int[] averageCompetences;
+
 
     public Player()
     {
@@ -143,16 +145,18 @@ public class Player
         averageCost = 0;
         averageAtk = 0;
         averageDef = 0;
+        averageCompetences = new int[1 << Enum.GetValues(typeof(AssetList.Competences)).Length];
         foreach (Card card in deck)
         {
             averageCost += card.cost;
             averageAtk += card.attack;
             averageDef += card.defense;
+            averageCompetences[(int)card.competences]++;
         }
         averageCost /= deck.Count;
         averageAtk /= deck.Count;
         averageDef /= deck.Count;
-
+        
         for (int loop = 0; loop < cardCountStart; loop++)
         {
             hand.AddCard(Draw());

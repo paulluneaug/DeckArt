@@ -65,6 +65,13 @@ public class GameManager : MonoBehaviour
             metrics.WriteData("Average Defense", player.averageDef.ToString("R", CultureInfo.InvariantCulture));
             metrics.WriteData("Average Game Duration", m_averageTurnThisIteration.ToString("R", CultureInfo.InvariantCulture));
 
+            for (int loop = 0; loop < 1 << Enum.GetValues(typeof(AssetList.Competences)).Length; loop++)
+            {
+                AssetList.Competences competence = (AssetList.Competences)loop;
+                metrics.WriteData(competence.ToString(), player.averageCompetences[(int)competence].ToString());
+            }
+            
+
             FinishIteration(winRate, i);
         }
 
