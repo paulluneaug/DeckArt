@@ -20,10 +20,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] public bool m_decreaseCardsModified = false;
 
     [Title("JSON Paths")]
-
     [SerializeField] private string m_saveJsonPathFormat;
     [SerializeField] private string m_playerJsonPath;
     [SerializeField] private string m_referencePlayerJsonPath;
+
+    [Title("Generated player")]
+    [Button(nameof(GenerateRandomPlayer))]
+    [SerializeField] private string m_generatedPlayerJsonPath;
 
     [SerializeField, HideInInspector] public int m_iterationsOnDeck = 0;
     [NonSerialized] private Player referencePlayer, player;
@@ -190,6 +193,14 @@ public class GameManager : MonoBehaviour
         referencePlayer.Reset(false);
 
 
-        (currentPlayer, otherPlayer) = Random.value > 0.5f ? (player, referencePlayer) : (referencePlayer, player);
+        (currentPlayer, otherPlayer) = gamesToPlay % 2 == 0 ? (player, referencePlayer) : (referencePlayer, player);
+    }
+
+    private void GenerateRandomPlayer()
+    {
+        Player generatedPlayer = new Player();
+        generatedPlayer.Reset(true);
+
+        File.WriteAllText(m_generatedPlayerJsonPath, generatedPlayer.ToJson());
     }
 }
