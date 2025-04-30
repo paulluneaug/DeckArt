@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityUtility.MathU;
 
 [Serializable]
@@ -39,6 +40,7 @@ public class AssetList
                     }
                 }
             }
+            Debug.Log(instance.cards.Count);
         }
         return instance;
     }
@@ -47,7 +49,7 @@ public class AssetList
     public enum Competences
     {
         Provoc = 1 << 0,
-        //Deferlement = 1 << 1, // Piètinement
-        //Distortion = 1 << 2, // Imblocable sauf par distortion
+        Deferlement = 1 << 1, // Piètinement
+        Distortion = 1 << 2, // Imblocable sauf par distortion
     }
 }

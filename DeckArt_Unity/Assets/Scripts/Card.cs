@@ -37,10 +37,11 @@ public class Card
         return HasCompetence(this.competences, competenceToTest);
     }
 
-    public void Block(Card card)
+    public int Block(Card card)
     {
         currentDefense -= card.attack;
         card.currentDefense -= attack;
+        return Math.Max(0, -card.currentDefense);
     }
 
     public void EndTurn()
@@ -66,6 +67,8 @@ public class Card
     {
         int cost = (int)MathUf.Floor((attack + defense) / 2.0f);
         cost += HasCompetence(competences, AssetList.Competences.Provoc) ? 1 : 0;
+        cost += HasCompetence(competences, AssetList.Competences.Deferlement) ? 1 : 0;
+        cost += HasCompetence(competences, AssetList.Competences.Distortion) ? 1 : 0;
         return cost;
     }
     

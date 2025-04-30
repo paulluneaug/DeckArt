@@ -83,17 +83,33 @@ public class Player
     public int Block(Board otherBoard)
     {
         int attackingCardIndex = 0;
+        int residualDamage = 0;
         foreach (Card cardWithProvoc in board.GetProvocCards())
         {
             while (cardWithProvoc.currentDefense > 0 && attackingCardIndex < otherBoard.cards.Count)
             {
                 Card attackingCard = otherBoard.cards[attackingCardIndex];
-                cardWithProvoc.Block(attackingCard);
+
+                bool shouldBlock = attackingCard.HasCompetence(AssetList.Competences.Distortion) || 
+                                   (attackingCard.HasCompetence(AssetList.Competences.Distortion) &&
+                                    cardWithProvoc.HasCompetence(AssetList.Competences.Distortion));
+
+                if(!shouldBlock)
+                    residualDamage += attackingCard.attack;
+                else
+                {
+                    int potentialDamage = cardWithProvoc.Block(attackingCard);
+                    if (attackingCard.HasCompetence(AssetList.Competences.Deferlement))
+                    {
+                        residualDamage += potentialDamage;
+                    }
+                }
                 
                 attackingCardIndex++;
             }
         }
         
+        TakeDamage(residualDamage);
         return attackingCardIndex;
     }
 
