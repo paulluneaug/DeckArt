@@ -158,7 +158,7 @@ public class GameManager : MonoBehaviour
 
         m_averageTurnThisIteration++;
 
-        if (otherPlayer.currentHealth <= 0)
+        if (otherPlayer.currentHealth <= 0 || otherPlayer.deck.Count <= 0)
         {
             Win(currentPlayer, otherPlayer);
             return true;
